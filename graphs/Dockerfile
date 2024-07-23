@@ -12,6 +12,9 @@ RUN mkdir /root/.parallel && \
 # Install pip
 RUN curl https://bootstrap.pypa.io/pip/3.4/get-pip.py | python
 
+# Install typing module for Python 3.4
+RUN pip install typing
+
 # Install grafanalib
 RUN pip install git+https://github.com/weaveworks/grafanalib@82556ddfbbd6134837d280a7999d35c45cc3c87e
 
