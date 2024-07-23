@@ -4,15 +4,11 @@ import os
 
 from grafanalib.core import *
 
-def service_row(datasource, serviceTitle, serviceName):
-    return Row(
-        title=serviceTitle,
-        showTitle=True,
-        panels=[
-            service_qps_graph(datasource, serviceTitle, serviceName),
-            service_latency_graph(datasource, serviceTitle, serviceName),
-        ],
-    )
+def service_panels(datasource, serviceTitle, serviceName):
+    return [
+        service_qps_graph(datasource, serviceTitle, serviceName),
+        service_latency_graph(datasource, serviceTitle, serviceName),
+    ]
 
 def service_qps_graph(datasource, serviceTitle, serviceName):
     title = serviceTitle + " QPS"
@@ -39,8 +35,8 @@ def service_qps_graph(datasource, serviceTitle, serviceName):
         ],
         xAxis=XAxis(mode="time"),
         yAxes=[
-            YAxis(format=OPS_FORMAT, show=True, label="QPS (1 min)", min=0),
-            YAxis(format=SHORT_FORMAT, show=True, min=None),
+            YAxis(format="ops", show=True, label="QPS (1 min)", min=0),
+            YAxis(format="short", show=True, min=None),
         ],
     )
 
@@ -70,30 +66,30 @@ def service_latency_graph(datasource, serviceTitle, serviceName):
         ],
         xAxis=XAxis(mode="time"),
         yAxes=[
-            YAxis(format=SECONDS_FORMAT, show=True, min=0),
-            YAxis(format=SHORT_FORMAT, show=True, min=None),
+            YAxis(format="s", show=True, min=0),
+            YAxis(format="short", show=True, min=None),
         ],
     )
 
 datasource = "prometheus"
-rows = []
+panels = []
 services = [
-        {"name": "catalogue", "title": "Catalogue"},
-        {"name": "carts", "title": "Cart"},
-        {"name": "orders", "title": "Orders"},
-        {"name": "payment", "title": "Payment"},
-        {"name": "shipping", "title": "Shipping"},
-        {"name": "user", "title": "User"},
-        {"name": "front-end", "title": "Front End"},
+    {"name": "catalogue", "title": "Catalogue"},
+    {"name": "carts", "title": "Cart"},
+    {"name": "orders", "title": "Orders"},
+    {"name": "payment", "title": "Payment"},
+    {"name": "shipping", "title": "Shipping"},
+    {"name": "user", "title": "User"},
+    {"name": "front-end", "title": "Front End"},
 ]
 
 for service in services:
-    rows.append(service_row(datasource, service["title"], service["name"]))
+    panels.extend(service_panels(datasource, service["title"], service["name"]))
 
 dashboard = Dashboard(
     title="Sock Shop Performance",
     time=Time("now-30m", "now"),
     timezone="browser",
     refresh="5s",
-    rows=rows,
+    panels=panels,
 ).auto_panel_ids()
